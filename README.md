@@ -1,4 +1,4 @@
-pmxdr is a cross-domain [XHR][1] JavaScript library standard that doesn't rely on any proprietary technologies like Flash, but instead uses the HTML5 postMessage API to make requests. pmxdr stands for postMessage cross-domain requester. It respects all applicable HTTP access control headers, even on browsers that don't support them but do support postMessage, like Firefox 3. There is one drawback though--it requires that a pmxdr host be on the target domain (at /pmxdr/api). If you would like to implement your own pmxdr client library or pmxdr host library, please refer to the [pmxdr standard][2]. 
+pmxdr is a cross-domain [XHR][2] JavaScript library standard that doesn't rely on any proprietary technologies like Flash, but instead uses the HTML5 postMessage API to make requests. pmxdr stands for postMessage cross-domain requester. It respects all applicable HTTP access control headers, even on browsers that don't support them but do support postMessage, like Firefox 3. There is one drawback though--it requires that a pmxdr host be on the target domain (at /pmxdr/api). If you would like to implement your own pmxdr client library or pmxdr host library, please refer to the pmxdr standard at the bottom of this README.
 
 ## Supported Browsers
 
@@ -173,6 +173,73 @@ The following is an example configuration of `alwaysTrustedOrigins`:
         /^https?:\/\/([\w\.-]+\.)?example\.com$/ // these will all be allowed: https://example.com, http://example.com, https://*.example.com, http://*.example.com
     ];
 
- [1]: https://developer.mozilla.org/en/XMLHttpRequest "XMLHttpRequest"
- [2]: http://eligrey.com/blog/projects/pmxdr/standard/
+## pmxdr standard
+
+The pmxdr (postMessage cross-domain requester) standard defines the standard communication format used by pmxdr clients and hosts via the postMessage interface. You may use this standard to implement your own pmxdr-compliant libraries. The key words "must", "must not", "required", "shall", "shall not", "should", "should not", "recommended", "may", and "optional" in this document are to be interpreted as described in [RFC 2119][1]. pmxdr hosts must always be accessible through the following relative location from a website and should not redirect to another location: `/pmxdr/api` *Note:* All requests and responses to hosts and clients must be valid JSON format. The order of properties in request and response JSON objects must not affect any aspect of communication between host and client. 
+
+## Request Format
+
+Requests to pmxdr hosts must be in a valid JSON object. The requests must have all of the following required properties in the root of the JSON object (ie. if "a" is required, it must be at {a}, not {foo:{a}}). All properties must be treated as case-sensitive. 
+
+*   `pmxdr` 
+    *   Required property. Must be `true`.
+*   `id` 
+    *   Optional property. Should be a string. It is recommended to make this a unique identification that is not the same as the identification of a request still being processed by the pmxdr host. Must not be null anything that can == false in JavaScript. If this property is specified in a request, the host must define an identical id property in it's response JSON object.
+*   `uri` 
+    *   Required property. Should be an absolute or relative location accessible by the pmxdr host. The host must attempt to request this location using an [XMLHttpRequest][2] and should parse the following response headers and the origin of the requesting client and determine if the client is allowed to access the resource. Other methods may be used like the `alwaysTrustedOrigins` array used in the pmxdr host library reference implementation. 
+        *   Access-Control-Allow-Origin
+        *   Access-Control-Allow-Methods
+*   `method` 
+    *   Required property. It must be a string and must be treated as case-insensitive and converted to upper-case by the host. This must be used as the method for the XMLHttpRequest used to request `uri`.
+*   `data` 
+    *   Optional property. It must be a string and it should be sent as the body of an HTTP request if specified in a request.
+*   `headers` 
+    *   Optional property. It must be an object. All of it's properties should be strings.
+
+## Successful Response Format
+
+A JSON object in this format must be sent if no errors occurred and the requesting origin is allowed to view the response. 
+
+*   `pmxdr` 
+    *   Required property. Must be `true`.
+*   `id` 
+    *   If the request object specifies an id property, this property must be identical to that property.
+*   `status` 
+    *   This property must be identical to the `XMLHttpRequest` request's `status` property.
+*   `statusText` 
+    *   This property must be identical to the `XMLHttpRequest` request's `statusText` property.
+*   `data` 
+    *   Required property. Must be the value of the responseText property of the XMLHttpRequest.
+*   `headers` 
+    *   Required property. For every response header, the header name must be converted to lower-case and put as a property in this object with the header's value as the property's value.
+
+## Unsuccessful response format
+
+A JSON object in this format must be sent if an error occurred or the requesting origin is allowed to view the response. 
+
+*   `pmxdr` 
+    *   Required property. Must be `true`.
+*   `id` 
+    *   If the request object specifies an id property, this property must be identical to that property.
+*   `status` 
+    *   This property must be identical to the `XMLHttpRequest` request's `status` property.
+*   `statusText` 
+    *   This property must be identical to the `XMLHttpRequest` request's `statusText` property.
+*   `error` 
+    *   Required property. Should be a valid error code from the list of standard error codes below but may be any message. This must be a string and must be upper-case.
+    *   Standard error codes 
+        *   `DISALLOWED_ORIGIN`: The request origin was not allowed to request the resource.
+        *   `DISALLOWED_REQUEST_METHOD`: Request method (ie. GET, POST, ect.) was not allowed.
+        *   `LOAD_ERROR`: The requested resource did not return a 2xx HTTP response.
+        *   `UNKNOWN`: Unknown error. If you are lazy or just don't want to let a website know which thing is not allowed, make your host library send this instead of any error.
+        *   `TIMEOUT`: Request timed out.
+
+## Format Extensions
+
+pmxdr request and response format extensions (extra properties on request and response JSON objects) must be put in an "x" object. For example, the foobar extension would use x.foobar as it's property. The x object must be treated as case sensitive. Example "remaining-requests" response format extension that signifies how many more requests are allowed to be made: 
+
+    {"pmxdr":true, /*...*/ "x":{"remaining-requests":5}}
+
+ [1]: http://www.ietf.org/rfc/rfc2119.txt
+ [2]: https://developer.mozilla.org/en/XMLHttpRequest "XMLHttpRequest"
  [3]: http://code.eligrey.com/pmxdr/demo.html

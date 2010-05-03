@@ -77,7 +77,9 @@ The response object will be in this format:
     Access-Control-Allow-Origin: http://example.com, http://eligrey.com, http://an-example-com-affiliate.com
     Access-Control-Allow-Methods: GET, POST
 
-**Note:** `Access-Control-Allow-Origin: *` would also work but would allow all requests The pmxdr host then checks to see if the original requesting window is permitted to get the data from the HTTP request. If the original requesting window is permitted to view this data, it sends back the following response: 
+**Note:** `Access-Control-Allow-Origin: *` would also work but would allow all requests.
+
+The pmxdr host then checks to see if the original requesting window is permitted to get the data from the HTTP request. If the original requesting window is permitted to view this data, it sends back the following response: 
     {pmxdr: true, headers:{"content-type":"application/json" /*, ...the rest of the headers...*/}, status: 200, data: '[{"name":"foo Inc","url":"http://foo.example/","description":"the world leader in foo"},{"name":"foo experts","url":"http://foobar.example/","description":"we are experts on foo!"}]', id:"5832485502879199"} Now that you got the basics, let's do a little more advanced example which uses example.com's more advanced fictional "search2" interface using a pmxdr instance and then doing two requests.: 
 
     var pmxdrInstance = new pmxdr("http://example.com");

@@ -389,6 +389,8 @@ how many more requests are allowed to be made:
     {"pmxdr":true, /*...*/ "x":{"remaining-requests":5}}
 
 
+![Tracking image](//in.getclicky.com/212712ns.gif =1x1)
+
 
  [1]: http://www.ietf.org/rfc/rfc2119.txt
  [2]: https://developer.mozilla.org/en/XMLHttpRequest "XMLHttpRequest"

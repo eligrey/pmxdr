@@ -2,7 +2,7 @@
 * postMessage Cross-Domain Requester host library
 * http://code.eligrey.com/pmxdr/host/
 *
-* By Elijah Grey, http://eligrey.com
+* By Eli Grey, http://eligrey.com
 *
 * Simple cross-site HTTP requesting using the postMessage API
 *

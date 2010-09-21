@@ -10,6 +10,8 @@
 *          http://eligrey.com/about/licence/
 */
 
+/*! @source http://purl.eligrey.com/github/pmxdr/blob/master/pmxdr-host.js*/
+
 /* example alwaysTrustedOrigins settings:
 
 var alwaysTrustedOrigins = [

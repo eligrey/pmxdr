@@ -7,6 +7,8 @@
 @author Eli Grey, http://eligrey.com
 */
 
+/*! @source http://purl.eligrey.com/github/pmxdr/blob/master/pmxdr-client.js*/
+
 (function() {
 	
 	var window = this;

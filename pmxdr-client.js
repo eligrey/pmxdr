@@ -2,8 +2,7 @@
 @version 0.0.6
 @archive http://code.eligrey.com/pmxdr/client/
 @desc Cross-domain HTTP requesting using the postMessage API
-@license GPL v3 and X11/MIT License
-				 http://eligrey.com/about/license/
+@license X11/MIT
 @author Eli Grey, http://eligrey.com
 */
 

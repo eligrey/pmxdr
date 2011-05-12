@@ -389,7 +389,7 @@ how many more requests are allowed to be made:
     {"pmxdr":true, /*...*/ "x":{"remaining-requests":5}}
 
 
-![Tracking image](//in.getclicky.com/212712ns.gif =1x1)
+![Tracking image](//in.getclicky.com/212712ns.gif)
 
 
  [1]: http://www.ietf.org/rfc/rfc2119.txt

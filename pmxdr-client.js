@@ -161,7 +161,7 @@
 				aborted : {},
 				clear   : this.clear
 			};
-		},
+		}
 	};
 
 	function pmxdrResponseHandler(evt) {

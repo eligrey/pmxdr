@@ -109,7 +109,7 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
                   data       : this.responseText,
                   headers    : {}, // populated with headers below
                   status     : (typeof req.status == "number") ? req.status : null, // possible 0, check for type
-                  statusText : req.statusText || null,
+                  statusText : req.statusText || null
                 }; if (typeof data.id != "undefined") response.id = data.id;
             
                 var responseHeaders = this.getAllResponseHeaders().split(/\r?\n/);

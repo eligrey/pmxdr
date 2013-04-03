@@ -147,6 +147,8 @@ this data, it sends back the following response:
 
     {pmxdr: true, headers:{"content-type":"application/json" /*, ...the rest of the headers...*/}, status: 200, data: '[{"name":"foo Inc","url":"http://foo.example/","description":"the world leader in foo"},{"name":"foo experts","url":"http://foobar.example/","description":"we are experts on foo!"}]', id:"5832485502879199"} Now that you got the basics, let's do a little more advanced example which uses example.com's more advanced fictional "search2" interface using a pmxdr instance and then doing two requests.: 
 
+#### Using instances
+
     var pmxdrInstance = new pmxdr("http://example.com");
     pmxdrInstance.onload = function() {
         this.request([{
@@ -221,7 +223,7 @@ on the appropriate index:
         "http://example.com/foo.html",
         "http://example.com/bar.html"
     ]);
-    for (let i=0; i<requests.length; i++) {
+    for (var i=0; i<requests.length; i++) {
         requests[i].abort();
     }
 

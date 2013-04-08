@@ -8,6 +8,6 @@ $version = "0.0.6";
 header("Content-Type: text/html; charset=UTF-8");
 header("ETag: ".$version);
 //Uncomment to cache for almost forever
-//header('Expires: Wed, 31 Dec 9999 00:00:00 GMT');
+//header('Expires: Sat, 31 Dec 2107 23:59:58 GMT');
 
 ?><!doctype html><script type="text/javascript"><?php include('pmxdr-host.js')?></script>

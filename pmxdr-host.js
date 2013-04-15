@@ -82,7 +82,7 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
 
       req.onreadystatechange = function() {
         if (this.readyState == 4) {
-          if (!this.status) {
+          if (this.status) {
             function getResponseHeader(header) {
               return req.getResponseHeader(header)
             }

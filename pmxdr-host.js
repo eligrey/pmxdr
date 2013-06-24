@@ -28,106 +28,6 @@ var alwaysTrustedOrigins = [
 
 */
 
-(function() {
-  var alwaysTrustedOrigins = [ // always trusted origins, can be exact strings or regular expressions
-    
-  ];
-
-  if (typeof window.opera != "undefined") { // Opera 9.x postMessage fix (only for http:, not https:)
-    if (parseInt(window.opera.version()) == 9) Event.prototype.__defineGetter__("origin", function() {
-      return "http://" + this.domain;
-    })
-  }
-
-  function pmxdrRequestHandler(evt) {
-    var alwaysTrusted = false, data = JSON.parse(evt.data), origin = evt.origin, sourceWindow = evt.source;
-    
-    if (data.pmxdr == true) { // only handle pmxdr requests
-    // accept anything value that is == to true
-    
-      for (var i=0; i<alwaysTrustedOrigins.length; i++) {
-        if (alwaysTrustedOrigins[i] instanceof RegExp)
-          alwaysTrusted = alwaysTrustedOrigins[i].test(origin);
-        else if (typeof alwaysTrustedOrigins[i] == "string")
-          alwaysTrusted = (origin === alwaysTrustedOrigins[i]);
-      }
-      
-      if (typeof data.method == "string") data.method = data.method.toUpperCase();
-      
-      var req = new XMLHttpRequest();
-      req.open(data.method, data.uri, true);
-      
-      if (data.headers)
-        for (var header in data.headers)
-          if (data.headers.hasOwnProperty(header))
-            req.setRequestHeader(header, data.headers[header]);
-      
-      if (typeof data.data == "string") req.send(data.data)
-      else req.send(null);
-
-      function err(errorCode) {
-        var errorResponse = {
-          pmxdr      : true,
-          error      : errorCode,
-          status     : (typeof req.status == "number") ? req.status : null, // possible 0, check for type
-          statusText : req.statusText || null,
-          id         : data.id
-        };
-
-        sourceWindow.postMessage(JSON.stringify(errorResponse), origin);
-      }
-
-      req.onreadystatechange = function() {
-        if (this.readyState == 4) {
-          if (this.status) {
-            function getResponseHeader(header) {
-              return req.getResponseHeader(header)
-            }
-        
-            var ac = { // access controls
-              origin : (getResponseHeader("Access-Control-Allow-Origin")||"").replace(/\s/g, ""),
-              methods: (getResponseHeader("Access-Control-Allow-Methods")||"").replace(/\s/g, "")
-              //,headers: (getResponseHeader("Access-Control-Allow-Headers")||"").replace(/\s/g, "")
-            };
-        
-            if ( // determine if origin is trusted
-                 alwaysTrusted == true
-                 || ac.origin == "*"
-                 || ac.origin.indexOf(origin) != -1 )
-            {
-              if ( // determine if request method was allowed
-                  !ac.methods
-                  || ac.methods == "*"
-                  || (typeof ac.methods == "string" && ac.methods.indexOf(data.method) != -1) )
-              {
-
-                var response = {
-                  pmxdr      : true, // signify that this is the response of a pmxdr request
-                  data       : this.responseText,
-                  headers    : {}, // populated with headers below
-                  status     : (typeof req.status == "number") ? req.status : null, // possible 0, check for type
-                  statusText : req.statusText || null
-                }; if (typeof data.id != "undefined") response.id = data.id;
-            
-                var responseHeaders = this.getAllResponseHeaders().split(/\r?\n/);
-                for (var i=0; i<responseHeaders.length; i++) {
-                  var header = responseHeaders[i].split(": ");
-                  response.headers[header[0].toLowerCase()] = header[1];
-                }
-                
-                return sourceWindow.postMessage(JSON.stringify(response), origin)
-              } else return err("DISALLOWED_REQUEST_METHOD"); // The request method was not allowed
-            } else return err("DISALLOWED_ORIGIN"); // The host was not allowed to request the resource
-          } else return err("LOAD_ERROR"); // Error loading the requested resource
-        }
-      }
-    }
-  }
-  
-  if (window.addEventListener) window.addEventListener("message", pmxdrRequestHandler, false); // normal browsers
-  else if (window.attachEvent) window.attachEvent("onmessage", pmxdrRequestHandler); // IE
-})();
-
 /* The following code blocks implement JSON.parse as pulled from 
  *     https://code.google.com/p/json-sans-eval/
  * because it's safer than using eval() and JSON.stringify from json2.js in
@@ -146,3 +46,335 @@ if (!JSON.parse) {
 if (!JSON.stringify) {
 	eval('(function(){function t(t){return 10>t?"0"+t:t}function e(t){return u.lastIndex=0,u.test(t)?\'"\'+t.replace(u,function(t){var e=i[t];return"string"==typeof e?e:"\\\\u"+("0000"+t.charCodeAt(0).toString(16)).slice(-4)})+\'"\':\'"\'+t+\'"\'}function n(t,u){var i,p,s,c,l,a=o,y=u[t];switch(y&&"object"==typeof y&&"function"==typeof y.toJSON&&(y=y.toJSON(t)),"function"==typeof f&&(y=f.call(u,t,y)),typeof y){case"string":return e(y);case"number":return isFinite(y)?y+"":"null";case"boolean":case"null":return y+"";case"object":if(!y)return"null";if(o+=r,l=[],"[object Array]"===Object.prototype.toString.apply(y)){for(c=y.length,i=0;c>i;i+=1)l[i]=n(i,y)||"null";return s=0===l.length?"[]":o?"[\\n"+o+l.join(",\\n"+o)+"\\n"+a+"]":"["+l.join(",")+"]",o=a,s}if(f&&"object"==typeof f)for(c=f.length,i=0;c>i;i+=1)"string"==typeof f[i]&&(p=f[i],s=n(p,y),s&&l.push(e(p)+(o?": ":":")+s));else for(p in y)Object.prototype.hasOwnProperty.call(y,p)&&(s=n(p,y),s&&l.push(e(p)+(o?": ":":")+s));return s=0===l.length?"{}":o?"{\\n"+o+l.join(",\\n"+o)+"\\n"+a+"}":"{"+l.join(",")+"}",o=a,s}}"function"!=typeof Date.prototype.toJSON&&(Date.prototype.toJSON=function(){return isFinite(this.valueOf())?this.getUTCFullYear()+"-"+t(this.getUTCMonth()+1)+"-"+t(this.getUTCDate())+"T"+t(this.getUTCHours())+":"+t(this.getUTCMinutes())+":"+t(this.getUTCSeconds())+"Z":null},String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(){return this.valueOf()});var o,r,f,u=/[\\\\\\"\\x00-\\x1f\\x7f-\\x9f\\u00ad\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]/g,i={"\\b":"\\\\b","	":"\\\\t","\\n":"\\\\n","\\f":"\\\\f","\\r":"\\\\r",\'"\':\'\\\\"\',"\\\\":"\\\\\\\\"};JSON.stringify=function(t,e,u){var i;if(o="",r="","number"==typeof u)for(i=0;u>i;i+=1)r+=" ";else"string"==typeof u&&(r=u);if(f=e,e&&"function"!=typeof e&&("object"!=typeof e||"number"!=typeof e.length))throw Error("JSON.stringify");return n("",{"":t})}})();');
 }
+
+/*global Event, window, XMLHttpRequest*/
+(function (undef) {
+	'use strict';
+
+	var alwaysTrustedOrigins;
+
+	alwaysTrustedOrigins = [
+		// Add any origins here that are always trusted.
+		// Can be exact strings or regular expressions.
+	];
+
+
+	/**
+	 * Clean a header response
+	 *
+	 * Trim and remove ALL whitespace.  This is because either we want
+	 * one value or we want a list separated by commas and optional
+	 * whitespace.
+	 *
+	 * @param string dirty
+	 * @return string clean
+	 */
+	function cleanHeader(dirty) {
+		var clean;
+		clean = dirty.replace(/[ \n\r\t]/g, '').toUpperCase();
+		return clean;
+	}
+
+
+	/**
+	 * Return an object of all headers
+	 *
+	 * @param XMLHttpRequest request
+	 * @return Object
+	 */
+	function getAllHeaders(request) {
+		var headers, header, i, responseHeaders;
+		headers = {};
+		responseHeaders = request.getAllResponseHeaders().split(/\r?\n/);
+
+		for (i = 0; i < responseHeaders.length; i += 1) {
+			header = responseHeaders[i].split(": ");
+			headers[header[0].toLowerCase()] = header[1];
+		}
+
+		return headers;
+	}
+
+
+	/**
+	 * Gets a single header from a response
+	 *
+	 * This can throw in rare instances, thus the try/catch block
+	 *
+	 * @param XMLHttpRequest request
+	 * @return object
+	 */
+	function getHeader(request, name) {
+		try {
+			return request.getResponseHeader(name);
+		} catch (e) {
+			return '';
+		}
+	}
+
+
+	/**
+	 * Gets headers that are related to CORS checks
+	 *
+	 * @param XMLHttpRequest request
+	 * @return object
+	 */
+	function getCorsHeaders(request) {
+		return {
+			origin: getHeader(request, 'Access-Control-Allow-Origin'),
+			methods: getHeader(request, 'Access-Control-Allow-Methods')
+		};
+	}
+
+
+	/**
+	 * Determine if a given method is allowed
+	 *
+	 * @param string method
+	 * @param string headerValue What the server allows
+	 * @return boolean
+	 */
+	function isAllowedMethod(method, headerValue) {
+		headerValue = cleanHeader(headerValue);
+
+		if (!headerValue || headerValue === '*') {
+			return true;
+		}
+
+		// Make the list start and end with commas as delimiters
+		headerValue = ',' + headerValue + ',';
+
+		// Try to match ,METHOD, in our list of ,ALLOWED,METHODS,
+		if (headerValue.indexOf(',' + method + ',') !== -1) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * See if an origin is whitelisted by this library
+	 *
+	 * @param string origin
+	 * @return boolean
+	 */
+	function isAlwaysTrusted(origin) {
+		var i, isTrusted;
+
+		for (i = 0; i < alwaysTrustedOrigins.length; i += 1) {
+			if (alwaysTrustedOrigins[i] instanceof RegExp) {
+				// Match the regular expression
+				isTrusted = alwaysTrustedOrigins[i].test(origin);
+			} else if (typeof alwaysTrustedOrigins[i] === "string") {
+				// Exact string matching
+				isTrusted = (origin === alwaysTrustedOrigins[i]);
+			}
+
+			if (isTrusted) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Checks if the origin is always trusted or if it matches the
+	 * response header's allowed origin.
+	 *
+	 * @param string origin
+	 * @param string headerValue
+	 * @return boolean
+	 */
+	function isTrustedOrigin(origin, headerValue) {
+		origin = origin.toUpperCase();
+
+		if (isAlwaysTrusted(origin)) {
+			return true;
+		}
+
+		headerValue = cleanHeader(headerValue);
+
+		if (headerValue === '*' || headerValue === origin) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Make a request to the server
+	 *
+	 * @param string method
+	 * @param string uri
+	 * @param Object headers
+	 * @param string data Optional data to send
+	 * @param Function callback Callback to call when done, callback(request)
+	 * @return XMLHttpRequest
+	 */
+	function makeRequest(method, uri, headers, data, callback) {
+		var header, request;
+
+		request = new XMLHttpRequest();
+		request.open(method, uri, true);
+
+		if (headers) {
+			for (header in headers) {
+				if (headers.hasOwnProperty(header)) {
+					request.setRequestHeader(header, headers[header]);
+				}
+			}
+		}
+
+		if (typeof data === "string") {
+			request.send(data);
+		} else {
+			request.send(null);
+		}
+
+		if (callback) {
+			request.onreadystatechange = function () {
+				if (request.readyState !== 4) {
+					return;
+				}
+
+				callback(request);
+			};
+		}
+
+		return request;
+	}
+
+	// Opera 9.x postMessage fix (only for http:, not https:)
+	if (window.opera !== undef) {
+		if (parseInt(window.opera.version(), 10) === 9) {
+			/*jslint nomen:true*/
+			Event.prototype.__defineGetter__("origin", function () {
+				return "http://" + this.domain;
+			});
+			/*jslint nomen:false*/
+		}
+	}
+
+	function pmxdrRequestHandler(evt) {
+		var data, optionsCorsHeaders, origin, source, reply;
+
+		function sendReply(response) {
+			source.postMessage(JSON.stringify(response), origin);
+		}
+
+		function replyError(code) {
+			reply.error = code;
+			sendReply(reply);
+		}
+
+		function handleResponse(request) {
+			var corsHeaders;
+
+			if (request.readyState !== 4) {
+				return;
+			}
+
+			reply.status = request.status;
+			reply.statusText = request.statusText;
+
+			if (!request.status) {
+				// Error loading the requested resource
+				replyError('LOAD_ERROR');
+				return;
+			}
+
+			// Handle IE's status code 1223 - see note below
+			if (request.status === 1223) {
+				reply.status = 204;
+				reply.statusText = 'No Content';
+				corsHeaders = optionsCorsHeaders;
+			} else {
+				corsHeaders = getCorsHeaders(request);
+			}
+
+			if (!isTrustedOrigin(origin, corsHeaders.origin)) {
+				// The host was not allowed to request the resource
+				replyError('DISALLOWED_ORIGIN');
+				return;
+			}
+
+			if (!isAllowedMethod(data.method, corsHeaders.methods)) {
+				// The request method was not allowed
+				replyError('DISALLOWED_REQUEST_METHOD');
+				return;
+			}
+
+			reply.data = request.responseText;
+			reply.headers = getAllHeaders(request);
+			sendReply(reply);
+		}
+
+		// evt gets removed by IE quickly.  We lose its information
+		// unless we copy it to local variables.
+		source = evt.source;
+		origin = evt.origin;
+
+		// Decode the JSON data from the event
+		try {
+			data = JSON.parse(evt.data);
+		} catch (e) {
+			return;
+		}
+
+		// Only handle pmxdr requests
+		if (typeof data !== 'object' || data.pmxdr !== true) {
+			return;
+		}
+
+		reply = {
+			pmxdr: true
+		};
+
+		if (data.id !== undef) {
+			reply.id = data.id;
+		}
+
+		if (typeof data.method === "string") {
+			data.method = data.method.toUpperCase();
+		}
+
+		/* Internet Explorer <= 9 may report a status code of 1223 when
+		 * there is a 204 No Content reply.  When that happens, the headers
+		 * are not accessible and thus we can not check to see if the
+		 * request is allowed via CORS.
+		 *
+		 * To combat this problem we issue an OPTIONS call.  If we use OPTIONS
+		 * after our request, we may get the wrong results.  If a resource
+		 * was deleted and we use OPTIONS on the deleted resource, we should
+		 * properly get a 404 error or similar.  So the OPTIONS call must
+		 * happen first.
+		 *
+		 * Issue an OPTIONS request first.  Then issue our real request.
+		 * If that returns with a status code of 1223, handle IE's quirk
+		 * and use the headers from the OPTIONS call for CORS.
+		 */
+		makeRequest('OPTIONS', data.uri, data.headers, null, function (optionsRequest) {
+			optionsCorsHeaders = getCorsHeaders(optionsRequest);
+
+			if (data.method === 'OPTIONS') {
+				handleResponse(optionsRequest);
+				return;
+			}
+
+			makeRequest(data.method, data.uri, data.headers, data.data, handleResponse);
+		});
+	}
+
+	if (window.addEventListener) {
+		window.addEventListener("message", pmxdrRequestHandler, false); // normal browsers
+	} else if (window.attachEvent) {
+		window.attachEvent("onmessage", pmxdrRequestHandler); // IE
+	}
+
+	// Expose to browser for testing
+	window.pmxdrRequestHandler = pmxdrRequestHandler;
+}());

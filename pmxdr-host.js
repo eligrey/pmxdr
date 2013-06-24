@@ -1,25 +1,30 @@
-/* pmxdr host v0.0.6
-* postMessage Cross-Domain Requester host library
-* http://code.eligrey.com/pmxdr/host/
-*
-* By Eli Grey, http://eligrey.com
-*
-* Simple cross-site HTTP requesting using the postMessage API
-*
-* License: X11/MIT Licence
-*/
+/**
+ * pmxdr host v0.0.6
+ * postMessage Cross-Domain Requester host library
+ * http://code.eligrey.com/pmxdr/host/
+ *
+ * By Eli Grey, http://eligrey.com
+ *
+ * Simple cross-site HTTP requesting using the postMessage API
+ *
+ * License: X11/MIT Licence
+ */
 
 /*! @source http://purl.eligrey.com/github/pmxdr/blob/master/pmxdr-host.js*/
 
 /* example alwaysTrustedOrigins settings:
 
 var alwaysTrustedOrigins = [
-    /^[\w-]+:(?:\/\/)?(?:[\w\.-]+\.)?eligrey\.com(?::\d+)?$/, // any origin on any protocol that has a domain that ends in eligrey.com
-    "http://www.google.com", // only http://www.google.com is allowed, not http://foo.google.com:30 or http://google.com
-    /^https?:\/\/([\w\.-]+\.)?example\.com$/ // these will all be allowed: https://example.com, http://example.com, https://*.example.com, http://*.example.com
-  ];
+    // any origin on any protocol that has a domain that ends in eligrey.com
+    /^[\w-]+:(?:\/\/)?(?:[\w\.-]+\.)?eligrey\.com(?::\d+)?$/,
 
-*/
+    // only http://www.google.com is allowed,
+	// not http://foo.google.com:30 or http://google.com
+    "http://www.google.com",
+
+    // Allow http and https from example.com and *.example.com
+    /^https?:\/\/([\w\.-]+\.)?example\.com$/
+];
 
 /* the following code block is the json2.js JSON API for if the browser does not natively support it
 	 This code block may look suspicious to you. That's because it's minified and packed.

@@ -93,7 +93,7 @@ The reference host library fully supports the pmxdr standard. It needs no config
 and defaults to the most restrictive settings of always requiring
 `Access-Control-Allow-Origin` and not trusting any origin by default, including the same
 website itself. When you set up the host library, it must be accessible via
-`http://your-domain`***`/pmxdr/api`***.
+`http://your-domain/pmxdr/api`.
 
 
 The Response Object

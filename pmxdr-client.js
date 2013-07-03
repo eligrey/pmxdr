@@ -165,7 +165,11 @@
 	};
 
 	function pmxdrResponseHandler(evt) {
-		var data = JSON.parse(evt.data);
+		try {
+			var data = JSON.parse(evt.data);
+		} catch (e) {
+			return;
+		}
 		if (data.pmxdr == true) { // only handle pmxdr requests
 			if (
 				pmxdr.requests[data.id]

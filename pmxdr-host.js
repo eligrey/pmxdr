@@ -71,6 +71,9 @@ if (!JSON.stringify) {
 	 * @return string clean
 	 */
 	function cleanHeader(dirty) {
+		if (typeof dirty !== "string") {
+			return "";
+		}
 		var clean;
 		clean = dirty.replace(/[ \n\r\t]/g, '').toUpperCase();
 		return clean;

@@ -33,13 +33,14 @@
 		else if (instance.iFrame.attachEvent)
 			instance.iFrame.attachEvent("onload", onloadHandler);
 
-		instance.iFrame.src = instance.origin + "/pmxdr/api";
+		instance.iFrame.src = instance.origin + pmxdr.getEndpoint(host);
 		if (typeof onload == "function") {
 			instance.onload = onload;
 			instance.init();
 		}
 	}
 	
+	pmxdr.endpoints = [];
 	pmxdr.originRegex = /^([\w-]+:\/*\[?[\w\.:-]+\]?(?::\d+)?).*/; // RegExp.$1 = protocol+host+port (the square brackets are for ipv6)
 	pmxdr.request = function(req) {
 		if (typeof req == "string")
@@ -77,8 +78,30 @@
 	pmxdr.getSafeID = function() { // generate a random key that doesn't collide with any existing keys
 				var randID = Math.random().toString().substr(2); // Generate a random number, make it a string, and cut off the "0." to make it look nice
 				if (typeof pmxdr.requests[randID] == "undefined") return randID; // key doesn't collide
-				else return safeRandID();
+				else return pmxdr.getSafeID();
 	}
+
+	pmxdr.getEndpoint = function(uri) {
+		var x,
+		endpoint,
+		endpoints = pmxdr.endpoints,
+		length = endpoints.length;
+
+		for (x = 0; x < length; x++) {
+			endpoint = endpoints[x];
+
+			if (typeof endpoint.origin === "string") {
+				if (!uri.indexOf(endpoint.origin)) {
+					break;
+				}
+			} else if (endpoint.origin.test(uri)) {
+				break;
+			}
+		}
+
+		return endpoint ? endpoint.endpoint : "/pmxdr/api";
+	}
+
 	pmxdr.prototype = {
 	
 		init: function(onload) { // load or reload iframe

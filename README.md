@@ -251,9 +251,24 @@ The client library has the following public configuration variables:
   appended to. Initially set to `document.documentElement
   || document.getElementsByTagName("head")[0] || document.body ||
   document.getElementsByTagName("body")[0]`.
+* `pmxdr.endpoints`: Array of endpoints so that you can change the default `pmxdr/api` per
+  origin at your desire.
 * You can override defaults for a whole pmxdr instance by specifying the property under
   the instance. For example: `var foo=new pmxdr("http://example.com"); foo.defaultTimeout
   = 60000`.
+
+Example usage of `pmxdr.endpoints`:
+
+pmxdr.endpoints.push({
+    origin: 'http://example.com',
+    endpoint: '/utils/pmxdr/api
+});
+
+pmxdr.endpoints.push({
+    origin: /^https?:\/\/some\.domain\.com\/some\/project,
+    endpoint: '/some/project/pmxdr/api.php'
+});
+
 
 The host library also has a private array named alwaysTrustedOrigins, which can be filled
 with protocol+host+non-standard port strings and regular expressions. Any website with an

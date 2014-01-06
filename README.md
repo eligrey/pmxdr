@@ -6,9 +6,11 @@ proprietary technologies like Flash, but instead uses the HTML5 postMessage API 
 requests. pmxdr stands for postMessage cross-domain requester. It respects most applicable
 HTTP access control headers, even on browsers that don't support them but do support
 postMessage, like Firefox 3. There is one drawback though--it requires that a pmxdr host
-be on the target domain (at /pmxdr/api). If you would like to implement your own pmxdr
-client library or pmxdr host library, please refer to the pmxdr standard at the bottom
-of this README.
+endpoint be on the target domain at `/pmxdr/api` (can be configured to use other locations).
+
+
+If you would like to implement your own pmxdr client library or pmxdr host library, please
+refer to the pmxdr standard at the bottom of this README.
 
 
 Supported Browsers
@@ -93,7 +95,8 @@ The reference host library fully supports the pmxdr standard. It needs no config
 and defaults to the most restrictive settings of always requiring
 `Access-Control-Allow-Origin` and not trusting any origin by default, including the same
 website itself. When you set up the host library, it must be accessible via
-`http://your-domain/pmxdr/api`.
+`http://your-domain/pmxdr/api` for interoperability with pmxdr clients with default
+endpoint configuration.
 
 
 The Response Object
@@ -259,15 +262,15 @@ The client library has the following public configuration variables:
 
 Example usage of `pmxdr.endpoints`:
 
-pmxdr.endpoints.push({
-    origin: 'http://example.com',
-    endpoint: '/utils/pmxdr/api
-});
-
-pmxdr.endpoints.push({
-    origin: /^https?:\/\/some\.domain\.com\/some\/project,
-    endpoint: '/some/project/pmxdr/api.php'
-});
+    pmxdr.endpoints.push({
+        origin: 'http://example.com',
+        endpoint: '/utils/pmxdr/api
+    });
+    
+    pmxdr.endpoints.push({
+        origin: /^https?:\/\/some\.domain\.com\/some\/project,
+        endpoint: '/some/project/pmxdr/api.php'
+    });
 
 
 The host library also has a private array named alwaysTrustedOrigins, which can be filled

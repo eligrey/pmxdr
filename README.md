@@ -239,11 +239,7 @@ Configuration
 
 The client library has the following public configuration variables: 
 
-* `pmxdr.originRegex`: The regular expression used to extract an HTML 5 "origin" from a
-  URI. The default of `^([\w-]+:\/*\[?[\w\.:-]+\]?(?::\d+)?).*/` is very flexible and
-  even works on IPv6 addresses. If you must edit it, make sure RegExp.$1 is the origin
-  captured, as that's what the pmxdr client library uses.
-* `pmxdr.prototype.defaultTimeout`: Not defined initially. Define this to apply a timeout
+* `pmxdr.prototype.defaultTimeout`: **Not defined initially**. Define this to apply a timeout
   to all pmxdr calls that don't specify an explicit timeout.
 * `pmxdr.prototype.defaultRequestMethod`: Initially set to "GET". This is the default
   request method if a request method if not specified in a pmxdr call.

@@ -82,10 +82,11 @@ defined as the string.
   defaults to `pmxdr.prototype.defaultTimeout`).
 
 `pmxdr.prototype.defaultTimeout` is not set by default in this client library but you
-can set it to have a global default timeout. To completely remove pmxdr, call its
-`destruct` method, which removes all event listeners and deletes the pmxdr variable.
-This does not delete any still-existing interface frames so don't forget to `unload`
-them when you are done to save memory. 
+can set it to have a global default timeout.
+
+To completely remove pmxdr, call its `destruct` method, which removes all event
+listeners and deletes the pmxdr variable. This does not delete any still-existing
+interface frames so don't forget to `unload` them when you are done to save memory. 
 
 
 Reference Host Library

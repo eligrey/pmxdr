@@ -7,7 +7,7 @@
  *
  * Simple cross-site HTTP requesting using the postMessage API
  *
- * License: X11/MIT Licence
+ * License: MIT Licence
  */
 
 /*! @source http://purl.eligrey.com/github/pmxdr/blob/master/pmxdr-host.js*/
